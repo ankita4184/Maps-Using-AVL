@@ -1,14 +1,12 @@
 package com.company;
-import java.io.*;
 import java.lang.*;
-import java.util.*;
 public class Avl {
     int key;
     Avl left;
     Avl right;
     int height;
-    Avl same;
     String s;
+    Avl same;
     public Avl(){
     }
     public Avl(int key, String s){
@@ -28,16 +26,16 @@ public class Avl {
         Avl temp = root.left;
         root.left = temp.right;
         temp.right = root;
-        root.height = Math.max((root.right == null) ? 0 : root.right.height, root.left == null ? 0 : root.left.height) + 1;
-        temp.height = Math.max((temp.right == null) ? 0 : temp.right.height, temp.left == null ? 0 : temp.left.height) + 1;
+        root.height = Math.max(H(root.right), H(root.left)) + 1;
+        temp.height = Math.max(H(temp.right), H(temp.left)) + 1;
         return temp;
     }
     private Avl singleRotateR(Avl root){
         Avl temp = root.right;
         root.right = temp.left;
         temp.left = root;
-        root.height = Math.max((root.right == null) ? 0 : root.right.height, root.left == null ? 0 : root.left.height) + 1;
-        temp.height = Math.max((temp.right == null) ? 0 : temp.right.height, temp.left == null ? 0 : temp.left.height) + 1;
+        root.height = Math.max(H(root.right), H(root.left)) + 1;
+        temp.height = Math.max(H(temp.right), H(temp.left)) + 1;
         return temp;
     }
     private Avl doubleRotateL(Avl root){
@@ -73,12 +71,70 @@ public class Avl {
         }
         else if(root.key == key){
             Avl temp = root;
+            Avl n = new Avl(key, s);
             while(temp.same != null){
                 temp = temp.same;
             }
-            temp.same = new Avl(key, s);
+            temp.same = n;
         }
         root.height = Math.max(H(root.left), H(root.right)) + 1;
+        return root;
+    }
+    public void inorder(Avl root){
+        if(root == null)
+                return;
+        inorder(root.left);
+        Avl temp = root;
+        while(temp != null) {
+            System.out.println(temp.key + " " + temp.s);
+            temp = temp.same;
+        }
+        inorder(root.right);
+    }
+    private int findMin(Avl r){
+        if(r == null)
+            return 0;
+        while(r.left != null)
+            r = r.left;
+        return r.key;
+    }
+    public Avl delete(Avl root, int key){
+        if(root == null)
+            return root;
+        if(root.key > key)
+            root.left = delete(root.left, key);
+        else if(root.key < key)
+            root.right = delete(root.right, key);
+        if(root.key == key){
+            if(root.left == null && root.right == null)
+                return null;
+            else if(root.left == null && root.right != null)
+                return root.right;
+            else if(root.left != null && root.right == null)
+                return root.left;
+            else{
+                root.key = findMin(root.right);
+                root.right = delete(root.right, root.key);
+            }
+        }
+        if(root == null)
+            return null;
+        root.height = Math.max(H(root.left), H(root.right)) + 1;
+        if(H(root.left) != H(root.right)) {
+            if (root.left != null && H(root.left) > H(root.right)) {
+                int t = H(root.left.left) - H(root.left.right);
+                if (t > 0)
+                    root = singleRotateL(root);
+                else
+                    root = doubleRotateL(root);
+            } else if(root.right != null) {
+                int p = H(root.right.left) - H(root.right.right);
+                if (p > 0)
+                    root = doubleRotateR(root);
+                else
+                    root = singleRotateR(root);
+            }
+        }
         return root;
     }
 }

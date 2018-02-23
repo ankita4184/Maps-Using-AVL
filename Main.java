@@ -12,18 +12,13 @@ public class Main {
 		Avl av = null;
 		for (i = 0; i < n; i++) {
 			key = in.nextInt();
-			key = hash(key);
 			s = in.nextLine();
 			av = r.add(av, key , s);
 		}
-
-	}
-
-	private static int hash(int k) {
-		Random r = new Random();
-		int a = r.nextInt(1000);
-		int b = r.nextInt(2000);
-		int m = ((a * k) + b) % 997;
-		return m;
+		r.inorder(av);
+		System.out.println();
+		key = in.nextInt();
+		av = r.delete(av,key);
+		r.inorder(av);
 	}
 }
